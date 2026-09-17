@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IC Indogrosir - Web Service</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome untuk Ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --sidebar-width: 250px;
+            --sidebar-bg: #2c3136;
+            --sidebar-hover: #1a1d20;
+            --header-bg: #4a89b8;
+            --main-bg: #f4f6f9;
+        }
+
+        body {
+            background-color: var(--main-bg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--sidebar-bg);
+            color: #fff;
+            min-height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+
+        .sidebar .brand {
+            padding: 15px 20px;
+            font-size: 1.25rem;
+            font-weight: bold;
+            background-color: #23272b;
+            display: block;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .sidebar .user-panel {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #3e444a;
+        }
+
+        .sidebar .user-panel img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+            background-color: #ccc;
+        }
+
+        .sidebar .user-panel .info {
+            font-size: 0.9rem;
+        }
+
+        .sidebar .user-panel .info span {
+            display: block;
+            font-size: 0.75rem;
+            color: #8bc34a; /* Warna hijau online */
+        }
+
+        .sidebar .nav-title {
+            padding: 15px 20px 5px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #6c757d;
+            letter-spacing: 1px;
+        }
+
+        .sidebar .nav-link {
+            color: #b8c7ce;
+            padding: 12px 20px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            transition: 0.2s;
+            text-decoration: none;
+        }
+
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background-color: var(--sidebar-hover);
+            color: #fff;
+            border-left: 3px solid #fff;
+        }
+
+        .sidebar .nav-link i {
+            width: 25px;
+            font-size: 1rem;
+        }
+
+        /* --- Main Content --- */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            transition: all 0.3s;
+        }
+
+        /* Header */
+        .top-header {
+            background-color: var(--header-bg);
+            color: #fff;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 60px;
+        }
+
+        .top-header .toggle-btn {
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .top-header .user-nav {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 0.9rem;
+        }
+
+        .top-header .user-nav img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        /* Content Area */
+        .content-wrapper {
+            padding: 20px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .page-header h2 {
+            font-size: 1.5rem;
+            font-weight: 300;
+            color: #333;
+            margin: 0;
+        }
+
+        .page-header h2 small {
+            font-size: 0.9rem;
+            color: #777;
+            margin-left: 10px;
+        }
+
+        .breadcrumb-custom {
+            font-size: 0.85rem;
+            color: #555;
+        }
+
+        .breadcrumb-custom i {
+            margin-right: 5px;
+        }
+
+        /* --- Link Cards (Menggantikan Stat Cards) --- */
+        .link-card {
+            display: block;
+            background-color: #fff;
+            border-radius: 6px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            text-decoration: none;
+            color: #333;
+            transition: all 0.2s ease-in-out;
+            height: 100%;
+            border-left: 4px solid var(--header-bg);
+            overflow: hidden;
+        }
+
+        .link-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            color: var(--header-bg);
+        }
+
+        .link-card .card-body {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .link-card .card-icon {
+            font-size: 2rem;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f0f8ff;
+            color: var(--header-bg);
+            border-radius: 50%;
+            margin-right: 15px;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+
+        .link-card:hover .card-icon {
+            background-color: var(--header-bg);
+            color: #fff;
+        }
+
+        .link-card .card-info h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0 0 5px 0;
+        }
+
+        .link-card .card-info p {
+            margin: 0;
+            font-size: 0.8rem;
+            color: #777;
+        }
+
+        /* Tabel Detail Login */
+        .table-card {
+            background: #fff;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-top: 3px solid #4a89b8;
+        }
+
+        .table-card .card-header {
+            background: #fff;
+            border-bottom: 1px solid #eee;
+            padding: 15px;
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        .table-card table {
+            margin-bottom: 0;
+        }
+
+        .table-card table th {
+            width: 30%;
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+        
+        .badge-manajemen {
+            background-color: #28a745;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <a href="#" class="brand">IC indogrosir</a>
+        
+        <div class="user-panel">
+            <img src="logo.png" alt="Indogrosir Logo">
+            <div class="info">
+                <a href="#" class="d-block text-white text-decoration-none">Inventory Control</a>
+                <span><i class="fas fa-circle fa-xs"></i> Online</span>
+            </div>
+        </div>
+
+        <div class="nav-title">Main Navigation</div>
+        
+        <nav class="nav flex-column">
+            <a class="nav-link active" href="#">
+                <i class="fas fa-tachometer-alt"></i> DASHBOARD
+            </a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header class="top-header">
+            <div class="toggle-btn" id="toggleSidebar">
+                <i class="fas fa-bars"></i>
+            </div>
+            <div class="user-nav">
+                <div class="d-flex align-items-center">
+                    <img src="logo.png" alt="Indogrosir Logo">
+                    <span>Inventory Control</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Wrapper -->
+        <div class="content-wrapper">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h2>Dashboard <small>Daftar Menu Laporan</small></h2>
+                <div class="breadcrumb-custom">
+                    <i class="fas fa-home"></i> Home &gt; Dashboard
+                </div>
+            </div>
+
+            <!-- Row Menu: Berdasarkan Index_old.html -->
+            <div class="row g-4">
+                
+                <!-- BAKP -->
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <a href="BAKP/" class="link-card">
+                        <div class="card-body">
+                            <div class="card-icon"><i class="fas fa-folder-open"></i></div>
+                            <div class="card-info">
+                                <h4>BAKP</h4>
+                                <p>Monitoring BAKP</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Barang Rusak -->
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <a href="Barang Rusak/" class="link-card">
+                        <div class="card-body">
+                            <div class="card-icon"><i class="fas fa-box-open"></i></div>
+                            <div class="card-info">
+                                <h4>Barang Rusak</h4>
+                                <p>Laporan Barang Rusak</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Barkos -->
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <a href="Barkos/" class="link-card">
+                        <div class="card-body">
+                            <div class="card-icon"><i class="fas fa-warehouse"></i></div>
+                            <div class="card-info">
+                                <h4>Barkos</h4>
+                                <p>Monitoring Barang Kosong</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Diskon -->
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <a href="Diskon/" class="link-card">
+                        <div class="card-body">
+                            <div class="card-icon"><i class="fas fa-tags"></i></div>
+                            <div class="card-info">
+                                <h4>Diskon</h4>
+                                <p>Diskon no return</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Klik dan SPI -->
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <a href="Klik dan SPI/" class="link-card">
+                        <div class="card-body">
+                            <div class="card-icon"><i class="fas fa-mouse-pointer"></i></div>
+                            <div class="card-info">
+                                <h4>Klik dan SPI</h4>
+                                <p>Monitoring Intransit, Batal, Sertim IPP, Siap Struk Belum Dikirim, dan PB vs Realisasi</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- LPP Retur -->
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <a href="LPP Retur/" class="link-card">
+                        <div class="card-body">
+                            <div class="card-icon"><i class="fas fa-undo-alt"></i></div>
+                            <div class="card-info">
+                                <h4>LPP Retur</h4>
+                                <p>Monitoring Stock Retur</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- LPP -->
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <a href="LPP/" class="link-card">
+                        <div class="card-body">
+                            <div class="card-icon"><i class="fas fa-file-invoice"></i></div>
+                            <div class="card-info">
+                                <h4>LPP</h4>
+                                <p>Monitoring LPP</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Monitoring SO -->
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <a href="Monitoring SO/" class="link-card">
+                        <div class="card-body">
+                            <div class="card-icon"><i class="fas fa-search"></i></div>
+                            <div class="card-info">
+                                <h4>Monitoring SO</h4>
+                                <p>Stock Opname</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- PO dan BTB -->
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <a href="PO dan BTB/" class="link-card">
+                        <div class="card-body">
+                            <div class="card-icon"><i class="fas fa-shopping-cart"></i></div>
+                            <div class="card-info">
+                                <h4>PO dan BTB</h4>
+                                <p>Monitoring PO dan BTB</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Request -->
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <a href="Request/" class="link-card">
+                        <div class="card-body">
+                            <div class="card-icon"><i class="fas fa-paper-plane"></i></div>
+                            <div class="card-info">
+                                <h4>Request</h4>
+                                <p>Untuk Memasukan Query Sederhana</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Retur Supplier -->
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <a href="Retur ke Supplier/" class="link-card">
+                        <div class="card-body">
+                            <div class="card-icon"><i class="fas fa-truck-loading"></i></div>
+                            <div class="card-info">
+                                <h4>Retur ke Supplier</h4>
+                                <p>Pengembalian ke supplier</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- SL Supplier -->
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <a href="SL Supplier/" class="link-card">
+                        <div class="card-body">
+                            <div class="card-icon"><i class="fas fa-clipboard-check"></i></div>
+                            <div class="card-info">
+                                <h4>SL Supplier</h4>
+                                <p>Service Supplier</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Sales Per Member atau Per PLU -->
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <a href="Sales Per Member atau Per PLU/" class="link-card">
+                        <div class="card-body">
+                            <div class="card-icon"><i class="fas fa-users"></i></div>
+                            <div class="card-info">
+                                <h4>Sales Per Member / PLU</h4>
+                                <p>Laporan penjualan detail</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Sales -->
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <a href="Sales/" class="link-card">
+                        <div class="card-body">
+                            <div class="card-icon"><i class="fas fa-chart-line"></i></div>
+                            <div class="card-info">
+                                <h4>Sales</h4>
+                                <p>Data penjualan all</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Tidak Ada Sales -->
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <a href="Tidak Ada 	Sales/" class="link-card">
+                        <div class="card-body">
+                            <div class="card-icon"><i class="fas fa-ban"></i></div>
+                            <div class="card-info">
+                                <h4>Tidak Ada Sales</h4>
+                                <p>Barang tanpa penjualan</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Rekap (Tambahan dari gambar awal) -->
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <a href="rekap/" class="link-card">
+                        <div class="card-body">
+                            <div class="card-icon"><i class="fas fa-file-alt"></i></div>
+                            <div class="card-info">
+                                <h4>Rekap</h4>
+                                <p>Rekap all</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Script toggle sidebar
+        document.getElementById('toggleSidebar').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.querySelector('.main-content');
+            
+            if (sidebar.style.marginLeft === '-250px') {
+                sidebar.style.marginLeft = '0';
+                mainContent.style.marginLeft = '250px';
+                mainContent.style.width = 'calc(100% - 250px)';
+            } else {
+                sidebar.style.marginLeft = '-250px';
+                mainContent.style.marginLeft = '0';
+                mainContent.style.width = '100%';
+            }
+        });
+    </script>
+</body>
+</html>
